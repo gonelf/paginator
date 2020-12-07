@@ -42,8 +42,17 @@
         border: solid 1px black;
         height: auto;
       }
+      .empty{
+        text-align: center;
+        background-color: lightgray;
+        color: gray;
+      }
 
       .ui-state-highlight { height: 1.5em; line-height: 1.2em; }
+      .sort{
+        border: solid 1px blue;
+      }
+
 
     </style>
 
@@ -71,10 +80,20 @@
       </div>
     </div>
     <script type="text/javascript">
+      var empty = "Empty container";
+      var itemCont = 0;
+      function emptyContainers () {
+        $(".container").each(function(item) {
+          if($(this).html() == "") {
+            $(this).addClass("empty");
+            $(this).html(empty);
+          }
+        });
+      }
       function identify (target) {
         if($("#page").find('div.identify').length == 0) {
           const p = target.position();
-          const top = p.top-target.outerHeight();
+          const top = p.top-25;
           const label = "<div class='identify' style='position: absolute; top: "+top+"px; left: "+p.left+"'>"+target.attr('type')+"</div>";
           $("#page").append(label);
         }
@@ -92,11 +111,24 @@
         $("#text-val").val(target.text());
       }
 
-      const blocks = {'text': '<div class="item text" type="text">Lorem Ipsum.</div>',
-        'container': '<div class="item container p-3" type="container"></div>'};
+      function addBlock (target, name) {
+        const blocks = {
+          'text': '<div class="item text" type="text">Lorem Ipsum.</div>',
+          'container': '<div class="item container p-3 connectedSortable empty" type="container">Empty container</div>'
+        };
+
+        var block = $(blocks[name]);
+
+        if (name == "container") {
+          block.droppable(droppableOptions);
+          block.sortable(sortableOptions);
+        }
+
+        $(target).append(block);
+      }
 
       $(".control").click(function(){
-        $("#page").append(blocks[this.id]);
+        addBlock("#page", this.id);
       });
       var currentSelection = null;
 
@@ -117,46 +149,42 @@
       });
 
       // sortable
-      $( function() {
-        // $( "#page" ).sortable({
-        //   placeholder: "ui-state-highlight",
-        //   connectWith: ".connectedSortable"
-        // }).disableSelection();
+      var placeholder;
+      var prev_container;
 
-        // $( ".container" ).sortable({
-        //   placeholder: "ui-state-highlight",
-        //   connectWith: ".container"
-        // }).disableSelection();
+      var sortableOptions = {
+        // helper: 'clone',
+        placeholder: "sort",
+        connectWith: ".container",
+        start: function (e, ui) {
+          ui.item.show();
+          placeholder = ui.item.clone().removeClass("connectedSortable")
+          .removeClass("ui-droppable").removeClass("ui-sortable")
+          .removeClass("ui-sortable-handle");
+          ui.item.after(placeholder).hide();
+        },
+        stop: function(event, ui) {
+          placeholder.remove();
+          setTimeout(function () {
+            emptyContainers();
+          }, 10);
 
-        var dropped = false;
-        var draggable_sibling;
+          if(dropped_container.hasClass("empty")) {
+            dropped_container.removeClass("empty");
+            var html = dropped_container.html();
+            dropped_container.html(html.replace(empty, ""));
+          }
+        },
+        helper: function() { return '<p></p>'; }
+      };
+      $(".container").sortable(sortableOptions);
 
-        $(".container").sortable({
-          // placeholder: "ui-state-highlight",
-            start: function(event, ui) {
-                draggable_sibling = $(ui.item).prev();
-            },
-            stop: function(event, ui) {
-                if (dropped) {
-                    if (draggable_sibling.length == 0)
-                        $('.container').prepend(ui.item);
-
-                    draggable_sibling.after(ui.item);
-                    dropped = false;
-                }
-            }
-        });
-
-        $(".container").droppable({
-            activeClass: 'active',
-            hoverClass:'ui-state-highlight',
-            drop:function(event,ui){
-                dropped = true;
-                $(event.target).addClass('dropped');
-            }
-        });
-
-      } );
+      var droppableOptions = {
+          drop:function(event,ui){
+            dropped_container = $(this);
+          }
+      };
+      $(".container").sortable(sortableOptions);
 
       // edit
       // text
@@ -164,7 +192,8 @@
         currentSelection.text($(this).val());
       });
 
-      $("#page").append(blocks['text']);
+      addBlock("#page", "text");
+      addBlock("#page", "container");
     </script>
   </body>
 </html>
