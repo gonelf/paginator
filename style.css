@@ -1,0 +1,44 @@
+html,
+body {
+  height: 100%
+}
+.text {
+  text-align: center;
+  font-size: 1em;
+  line-height: 1.5;
+  font-weight: 400;
+}
+.hover {
+  border: solid 1px gray;
+  cursor: pointer;
+}
+.selected {
+  border: solid 1px black;
+}
+
+.identify {
+  color: gray;
+}
+
+.controls {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 300px;
+  background: lightgray;
+}
+.edit{
+  border: solid 1px black;
+  height: auto;
+}
+.empty{
+  text-align: center;
+  background-color: lightgray;
+  color: gray;
+}
+
+.ui-state-highlight { height: 1.5em; line-height: 1.2em; }
+.sort{
+  border: solid 1px blue;
+}
