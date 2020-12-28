@@ -29,7 +29,7 @@ body {
   background: lightgray;
 }
 .edit{
-  border: solid 1px black;
+  /* border: solid 1px black; */
   height: auto;
 }
 .empty{
@@ -41,4 +41,8 @@ body {
 .ui-state-highlight { height: 1.5em; line-height: 1.2em; }
 .sort{
   border: solid 1px blue;
+}
+
+input {
+  width: 100%;
 }
